@@ -4,7 +4,7 @@ PKG_CONFIG = pkg-config
 EXTENSION = url
 MODULE_big = url
 OBJS = url.o
-DATA = # to be filled such as  uri--0.sql 
+DATA =  url--1.0.sql url.control
 
 ifeq (no,$(shell $(PKG_CONFIG) liburiparser || echo no))
 $(warning liburiparser not registed with pkg-config, build might fail)
