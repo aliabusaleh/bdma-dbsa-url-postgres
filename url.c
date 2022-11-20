@@ -44,6 +44,7 @@ Datum url_cast_from_text(PG_FUNCTION_ARGS);
 * IP4 is less than IP6 
 * not null is positive, null is negaitve
 * text is bigger than Ip, if you compare www.google.com AND  129.231.222.8 --> then  www.google.com > 129.231.222.8
+* do we need to check port/whole string ? 
 */
 static int
 url_cmp(Datum a, Datum b)
