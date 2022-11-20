@@ -4,7 +4,9 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "C:/Program Files/PostgreSQL/13/**"
+                "C:/Program Files/PostgreSQL/13/**",
+                "~/Desktop/ulb/dbsa/uriparser/**",
+                "/usr/include/postgresql/10/server/**"
             ],
             "defines": [
                 "_DEBUG",
