@@ -82,9 +82,31 @@ url_cmp(Datum a, Datum b)
 
 static int cmp_path(UriUriA *uap, UriUriA *ubp)
 {
-// implement this 
+	// if first host is null
+	if(!uap.pathHead->text.first){
+		// if second host is null 
+		if(!ubp.pathHead->text.first){
+			// both of them are null
+			return 0;
+		}
+		// first is null, but second is not null 
+		else {
+			return -1;
+		}
+	}
+	// first one isn't null, but second one is null
+	else if (!ubp.pathHead->text.first){
+		return 1;
+	}
+	
+	// at this stage both are not null, we need to compare 
+	else {
+
+	}
 
 }
+
+static int cmp_nodes()
 
 static int
 cmp_hosts(UriUriA *uap, UriUriA *ubp)
