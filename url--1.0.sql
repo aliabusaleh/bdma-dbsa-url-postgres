@@ -49,12 +49,6 @@ RETURNS text
 AS '$libdir/url', 'url_cast_to_text'
 LANGUAGE C IMMUTABLE STRICT;
 
-
-CREATE OR REPLACE FUNCTION text(url)
-RETURNS text
-AS '$libdir/url', 'url_cast_to_text'
-LANGUAGE C IMMUTABLE STRICT;
-
 -- Btree
 CREATE FUNCTION url_cmp(ntext, ntext)
 RETURNS integer
