@@ -83,9 +83,9 @@ url_cmp(Datum a, Datum b)
 static int cmp_path(UriUriA *uap, UriUriA *ubp)
 {
 	// if first host is null
-	if(!uap.pathHead->text.first){
+	if(!uap->pathHead->text.first){
 		// if second host is null 
-		if(!ubp.pathHead->text.first){
+		if(!ubp->pathHead->text.first){
 			// both of them are null
 			return 0;
 		}
@@ -95,19 +95,48 @@ static int cmp_path(UriUriA *uap, UriUriA *ubp)
 		}
 	}
 	// first one isn't null, but second one is null
-	else if (!ubp.pathHead->text.first){
+	else if (!ubp->pathHead->text.first){
 		return 1;
 	}
 	
 	// at this stage both are not null, we need to compare 
-	else {
+	int result = 0;
+	result = cmp_text_range(uap->pathHead->text, ubp->pathHead->text);
+	if (result == 0){
 
+	struct UriPathSegmentStructA *uap_v2 = uap->pathHead->next;
+	struct UriPathSegmentStructA *ubp_v2 = ubp->pathHead->next;
+		result = cmp_nodes(uap_v2, ubp_v2)
 	}
+
+	// return the results anyway 
+	return result;
 
 }
 
-static int cmp_nodes()
-
+static int cmp_nodes(struct UriPathSegmentStructA *a, struct UriPathSegmentStructA *b)
+{
+	int res = 0 
+	while (a != NULL && b != NULL) {
+		res = cmp_text_range(a->text, b->text)
+		if res != 0
+		return res;
+        /* If we reach here, then a and b are not NULL and
+           their data is same, so move to next nodes in both
+           lists */
+		a = a->next;
+		b = b->next;
+	}
+	// maybe of of them are is shorter than the other 
+	// case a is longer ( and b reached null )
+	if (a != NULL) return -1;
+	// case b is longer ( and a reached null )
+    if (b != NULL) return 1;
+    // If linked lists are identical, then 'a' and 'b' must
+    // be NULL at this point.
+	// return 0 
+	return 0;
+}
 static int
 cmp_hosts(UriUriA *uap, UriUriA *ubp)
 {
