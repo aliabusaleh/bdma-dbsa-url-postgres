@@ -49,3 +49,18 @@ RETURNS text
 AS '$libdir/url', 'url_cast_to_text'
 LANGUAGE C IMMUTABLE STRICT;
 
+-- Btree
+CREATE FUNCTION url_cmp(ntext, ntext)
+RETURNS integer
+AS '$libdir/url'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE OPERATOR CLASS btree_url_ops
+DEFAULT FOR TYPE url USING btree
+AS
+        OPERATOR        1       <  ,
+        OPERATOR        2       <= ,
+        OPERATOR        3       =  ,
+        OPERATOR        4       >= ,
+        OPERATOR        5       >  ,
+        FUNCTION        1       url_cmp(url, url);
