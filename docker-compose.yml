@@ -1,0 +1,11 @@
+ version: '3'
+
+ services:
+   postgre_ext:
+     image: pacific31/postgres_uri:latest
+     tty: true
+     volumes:
+       - .:/url_extension
+    #  command: "pg_ctlcluster 14 main start"
+     entrypoint: /bin/bash
+     container_name: postgre_ext
