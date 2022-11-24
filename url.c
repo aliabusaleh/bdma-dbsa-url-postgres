@@ -147,7 +147,7 @@ url_in_part_four(PG_FUNCTION_ARGS)
 	char* arg2 = PG_GETARG_CSTRING(1);
 	char* s = TextDatumGetCString(arg1);
 	char* new_text;
-	new_text = malloc(strlen(s) + strlen(arg2) + +1 + 10);
+	new_text = malloc(strlen(s) + strlen(arg2) +1 + 10);
 	strcpy(new_text, s);
 	strcat(new_text, arg2);
 	parse_url(new_text, &uri);
