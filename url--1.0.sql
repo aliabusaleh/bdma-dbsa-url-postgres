@@ -3,28 +3,32 @@
 \echo Use "CREATE EXTENSION url" to load this file. \quit
  
 -- URL(varchar spec)
+-- Usage insert into test values(url_in('https://www.google.com'));
 CREATE OR REPLACE FUNCTION url_in(cstring)
 RETURNS url
-AS '$libdir/url','url_in'
+AS '$libdir/url'
 LANGUAGE C IMMUTABLE STRICT;
 
-
+-- URL(varchar protocol, varchar host, int port, varchar file)
+-- Usage insert into test values(url_in('https','www.yahoo.com',32,'abc.png'));
 CREATE OR REPLACE FUNCTION url_in(cstring, cstring, integer, cstring)
 RETURNS url
-AS '$libdir/url', 'url_in_part_two'
+AS '$libdir/url'
 LANGUAGE C IMMUTABLE STRICT;
 
-
+-- URL(varchar protocol, varchar host, varchar file)
+-- Usage insert into test values(url_in('http','www.ahmad.com','test.gif'));
 CREATE OR REPLACE FUNCTION url_in(cstring, cstring, cstring)
 RETURNS url
-AS '$libdir/url', 'url_in_part_three'
+AS '$libdir/url'
 LANGUAGE C IMMUTABLE STRICT;
 
-
+-- URL(URL context, varchar spec)
 CREATE OR REPLACE FUNCTION url_in(url, cstring)
 RETURNS url
-AS '$libdir/url', 'url_in_part_four'
+AS '$libdir/url'
 LANGUAGE C IMMUTABLE STRICT;
+
 
 
 
