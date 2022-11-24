@@ -21,22 +21,149 @@
 // magic module 
 PG_MODULE_MAGIC;
 
-
 typedef struct varlena url;
+#define PG_RETURN_URL_P(x)	PG_RETURN_POINTER(x)
+
+
 
 
 Datum url_in(PG_FUNCTION_ARGS);
 Datum url_out(PG_FUNCTION_ARGS);
-Datum url_recv(PG_FUNCTION_ARGS);
-Datum url_send(PG_FUNCTION_ARGS);
+// Datum url_recv(PG_FUNCTION_ARGS);
+// Datum url_send(PG_FUNCTION_ARGS);
 Datum url_cast_to_text(PG_FUNCTION_ARGS);
 Datum url_cast_from_text(PG_FUNCTION_ARGS);
 
 
 
 
+static char* toArray(int number)
+{
+	int n = log10(number) + 1;
+	int i;
+	char* numberArray = calloc(n, sizeof(char));
+	for (i = n - 1; i >= 0; --i, number /= 10)
+	{
+		numberArray[i] = (number % 10) + '0';
+	}
+	return numberArray;
+}
+
+static void
+parse_url(const char* s, UriUriA* urip)
+{
+	UriParserStateA state;
+
+	state.uri = urip;
+	uriParseUriA(&state, s);
+
+	switch (state.errorCode)
+	{
+	case URI_SUCCESS:
+		elog(INFO, "I am here %s", s);
+		return;
+	case URI_ERROR_SYNTAX:
+		ereport(ERROR,
+			(errcode(ERRCODE_INVALID_TEXT_REPRESENTATION),
+				errmsg("invalid input syntax for type uri at or near \"%s\"",
+					state.errorPos)));
+		break;
+	default:
+		elog(ERROR, "liburiparser error code %d", state.errorCode);
+	}
+}
 
 
+
+PG_FUNCTION_INFO_V1(url_in);
+Datum
+url_in(PG_FUNCTION_ARGS)
+{
+	char* s = PG_GETARG_CSTRING(0);
+	url* vardata;
+	UriUriA uri;
+	parse_url(s, &uri);
+	uriFreeUriMembersA(&uri);
+	vardata = (url*)cstring_to_text(s);
+	PG_RETURN_URL_P(vardata);
+}
+
+
+PG_FUNCTION_INFO_V1(url_in_part_two);
+Datum
+url_in_part_two(PG_FUNCTION_ARGS)
+{
+	url* vardata;
+	UriUriA uri;
+	char* arg1 = PG_GETARG_CSTRING(0);
+	char* arg2 = PG_GETARG_CSTRING(1);
+	int32 arg3 = PG_GETARG_INT32(2);
+	char* arg4 = PG_GETARG_CSTRING(3);
+	char* port = toArray(arg3);
+	char* new_text;
+	new_text = malloc(strlen(arg1) + strlen(arg2) + strlen(port) + strlen(arg4) + 1 + 10);
+	strcpy(new_text, arg1);
+	strcat(new_text, "://");
+	strcat(new_text, arg2);
+	strcat(new_text, ":");
+	strcat(new_text, port);
+	strcat(new_text, "/");
+	strcat(new_text, arg4);
+	parse_url(new_text, &uri);
+	uriFreeUriMembersA(&uri);
+	vardata = (url*)cstring_to_text(new_text);
+	PG_RETURN_URL_P(vardata);
+}
+
+PG_FUNCTION_INFO_V1(url_in_part_three);
+Datum
+url_in_part_three(PG_FUNCTION_ARGS)
+{
+	url* vardata;
+	UriUriA uri;
+	char* arg1 = PG_GETARG_CSTRING(0);
+	char* arg2 = PG_GETARG_CSTRING(1);
+	char* arg3 = PG_GETARG_CSTRING(2);
+	char* new_text;
+	new_text = malloc(strlen(arg1) + strlen(arg2) + strlen(arg3) + 1 + 10);
+	strcpy(new_text, arg1);
+	strcat(new_text, "://");
+	strcat(new_text, arg2);
+	strcat(new_text, "/");
+	strcat(new_text, arg3);
+	parse_url(new_text, &uri);
+	uriFreeUriMembersA(&uri);
+	vardata = (url*)cstring_to_text(new_text);
+	PG_RETURN_URL_P(vardata);
+}
+
+PG_FUNCTION_INFO_V1(url_in_part_four);
+Datum
+url_in_part_four(PG_FUNCTION_ARGS)
+{
+	url* vardata;
+	UriUriA uri;
+	Datum arg1 = PG_GETARG_DATUM(0);
+	char* arg2 = PG_GETARG_CSTRING(1);
+	char* s = TextDatumGetCString(arg1);
+	char* new_text;
+	new_text = malloc(strlen(s) + strlen(arg2) +1 + 10);
+	strcpy(new_text, s);
+	strcat(new_text, arg2);
+	parse_url(new_text, &uri);
+	uriFreeUriMembersA(&uri);
+	vardata = (url*)cstring_to_text(new_text);
+	PG_RETURN_URL_P(vardata);
+}
+
+PG_FUNCTION_INFO_V1(url_out);
+Datum
+url_out(PG_FUNCTION_ARGS)
+{
+	Datum arg = PG_GETARG_DATUM(0);
+
+	PG_RETURN_CSTRING(TextDatumGetCString(arg));
+}
 
 
 // Btree compere function 

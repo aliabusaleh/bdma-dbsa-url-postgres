@@ -5,8 +5,28 @@
 -- URL(varchar spec)
 CREATE OR REPLACE FUNCTION url_in(cstring)
 RETURNS url
-AS '$libdir/url'
+AS '$libdir/url','url_in'
 LANGUAGE C IMMUTABLE STRICT;
+
+
+CREATE OR REPLACE FUNCTION url_in(cstring, cstring, integer, cstring)
+RETURNS url
+AS '$libdir/url', 'url_in_part_two'
+LANGUAGE C IMMUTABLE STRICT;
+
+
+CREATE OR REPLACE FUNCTION url_in(cstring, cstring, cstring)
+RETURNS url
+AS '$libdir/url', 'url_in_part_three'
+LANGUAGE C IMMUTABLE STRICT;
+
+
+CREATE OR REPLACE FUNCTION url_in(url, cstring)
+RETURNS url
+AS '$libdir/url', 'url_in_part_four'
+LANGUAGE C IMMUTABLE STRICT;
+
+
 
 -- varchar(URL spec)
 CREATE OR REPLACE FUNCTION url_out(url)
@@ -14,25 +34,27 @@ RETURNS cstring
 AS '$libdir/url'
 LANGUAGE C IMMUTABLE STRICT;
 
+
+-- Commenting recv and send code for now. Will check with professor
 --- operations over wire (API)
 
-CREATE OR REPLACE FUNCTION url_recv(internal)
-RETURNS url
-AS '$libdir/url'
-LANGUAGE C IMMUTABLE STRICT;
+-- CREATE OR REPLACE FUNCTION url_recv(internal)
+-- RETURNS url
+-- AS '$libdir/url'
+-- LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION url_send(url)
-RETURNS bytea
-AS '$libdir/url'
-LANGUAGE C IMMUTABLE STRICT;
+-- CREATE OR REPLACE FUNCTION url_send(url)
+-- RETURNS bytea
+-- AS '$libdir/url'
+-- LANGUAGE C IMMUTABLE STRICT;
 
 
 -- create the new type 
 CREATE TYPE url (
 	INPUT          = url_in,
 	OUTPUT         = url_out,
-	RECEIVE        = url_recv,
-	SEND           = url_send,
+-- 	RECEIVE        = url_recv,
+-- 	SEND           = url_send,
 	CATEGORY       = 'S'
 );
 COMMENT ON TYPE url IS 'url type  http://www.example.com<:port>/docs/resource1.html<#tag> where <> is optional';

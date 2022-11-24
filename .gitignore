@@ -1,0 +1,6 @@
+*.o
+*.so
+/results/
+*.bc
+.vscode
+.editorconfig
