@@ -65,28 +65,98 @@ COMMENT ON TYPE url IS 'url type  http://www.example.com<:port>/docs/resource1.h
 
 
 -- casting methods 
-CREATE OR REPLACE FUNCTION url(text)
-RETURNS url
-AS '$libdir/url', 'url_cast_from_text'
-LANGUAGE C IMMUTABLE STRICT;
+-- CREATE OR REPLACE FUNCTION url(text)
+-- RETURNS url
+-- AS '$libdir/url', 'url_cast_from_text'
+-- LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OR REPLACE FUNCTION text(url)
-RETURNS text
-AS '$libdir/url', 'url_cast_to_text'
-LANGUAGE C IMMUTABLE STRICT;
+-- CREATE OR REPLACE FUNCTION text(url)
+-- RETURNS text
+-- AS '$libdir/url', 'url_cast_to_text'
+-- LANGUAGE C IMMUTABLE STRICT;
 
 -- Btree
-CREATE FUNCTION url_cmp(ntext, ntext)
-RETURNS integer
-AS '$libdir/url'
+-- CREATE FUNCTION url_cmp(ntext, ntext)
+-- RETURNS integer
+-- AS '$libdir/url'
+-- LANGUAGE C IMMUTABLE STRICT;
+
+
+-- Get host function
+CREATE FUNCTION getHost(url) 
+RETURNS text
+AS '$libdir/url', 'get_host'
 LANGUAGE C IMMUTABLE STRICT;
 
-CREATE OPERATOR CLASS btree_url_ops
-DEFAULT FOR TYPE url USING btree
-AS
-        OPERATOR        1       <  ,
-        OPERATOR        2       <= ,
-        OPERATOR        3       =  ,
-        OPERATOR        4       >= ,
-        OPERATOR        5       >  ,
-        FUNCTION        1       url_cmp(url, url);
+-- Get port function
+CREATE FUNCTION getPort(url) 
+RETURNS integer
+AS '$libdir/url', 'get_port'
+LANGUAGE C IMMUTABLE STRICT;
+
+
+-- Get port function
+CREATE FUNCTION getDefaultPort(url) 
+RETURNS integer
+AS '$libdir/url', 'get_default_port'
+LANGUAGE C IMMUTABLE STRICT;
+
+
+-- Get protocol function
+CREATE FUNCTION getProtocol(url) 
+RETURNS text
+AS '$libdir/url', 'get_protocol'
+LANGUAGE C IMMUTABLE STRICT;
+
+-- Get protocol function
+CREATE FUNCTION getQuery(url) 
+RETURNS text
+AS '$libdir/url', 'get_query'
+LANGUAGE C IMMUTABLE STRICT;
+
+-- Get UserInfo function
+CREATE FUNCTION getUserInfo(url) 
+RETURNS text
+AS '$libdir/url', 'get_user_info'
+LANGUAGE C IMMUTABLE STRICT;
+
+-- Get UserInfo function
+
+CREATE FUNCTION getRef(url) 
+RETURNS text
+AS '$libdir/url', 'get_ref'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION getPath(url) 
+RETURNS text
+AS '$libdir/url', 'get_path'
+LANGUAGE C IMMUTABLE STRICT;
+
+
+
+CREATE FUNCTION getFile(url) 
+RETURNS text
+AS '$libdir/url', 'get_file'
+LANGUAGE C IMMUTABLE STRICT;
+
+
+CREATE FUNCTION getAuthority(url) 
+RETURNS text
+AS '$libdir/url', 'get_authority'
+LANGUAGE C IMMUTABLE STRICT;
+
+
+CREATE FUNCTION to_string(url) 
+RETURNS text
+AS '$libdir/url', 'get_string'
+LANGUAGE C IMMUTABLE STRICT;
+
+-- CREATE OPERATOR CLASS btree_url_ops
+-- DEFAULT FOR TYPE url USING btree
+-- AS
+--         OPERATOR        1       <  ,
+--         OPERATOR        2       <= ,
+--         OPERATOR        3       =  ,
+--         OPERATOR        4       >= ,
+--         OPERATOR        5       >  ,
+--         FUNCTION        1       url_cmp(url, url);
