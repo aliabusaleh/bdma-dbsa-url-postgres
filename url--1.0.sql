@@ -151,6 +151,11 @@ RETURNS text
 AS '$libdir/url', 'get_string'
 LANGUAGE C IMMUTABLE STRICT;
 
+CREATE FUNCTION sameHost(url,url) 
+RETURNS boolean
+AS '$libdir/url', 'same_host'
+LANGUAGE C IMMUTABLE STRICT;
+
 -- CREATE OPERATOR CLASS btree_url_ops
 -- DEFAULT FOR TYPE url USING btree
 -- AS
