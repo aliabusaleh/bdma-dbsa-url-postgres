@@ -305,8 +305,9 @@ static int cmp_path(UriUriA *uap, UriUriA *ubp)
  * do we need to check port/whole string ?
  */
 static int
-url_cmp(Datum a, Datum b)
+url_cmp(Datum a, Datum b, bool btree)
 {
+	// elog(INFO, "Entering url_cmp!");
 	char *sa = TextDatumGetCString(a);
 	char *sb = TextDatumGetCString(b);
 	UriUriA ua;
@@ -315,26 +316,54 @@ url_cmp(Datum a, Datum b)
 
 	parse_url(sa, &ua);
 	parse_url(sb, &ub);
-	elog(INFO, "I url cmp %s", sa);
-	elog(INFO, "I url cmp%s", sb);
+
+	// just remove fragments and query for Btree
+	if (btree == true){
+		// elog(INFO,"enter btree");
+		// elog(INFO, "I url cmp start %s", sa);
+		// elog(INFO, "I url cmp start %s", sb);
+		// ignore fragment
+		ua.fragment.first = NULL;
+		ua.fragment.afterLast = NULL;
+
+		ub.fragment.first = NULL;
+		ub.fragment.afterLast = NULL;
+
+		int charsRequired = 256;
+		char * uriStringa;
+		char * uriStringb;
+		uriStringa = malloc(charsRequired * sizeof(char));
+		uriStringb = malloc(charsRequired * sizeof(char));
+		uriToStringA(uriStringa, &ua, charsRequired, NULL);
+		uriToStringA(uriStringb, &ub, charsRequired, NULL);
+		sa = uriStringa;
+		sb = uriStringb;
+
+	}
+	// elog(INFO, "I url cmp %s", sa);
+	// elog(INFO, "I url cmp %s", sb);
 
 	if (res == 0)
 		res = cmp_text_range(ua.scheme, ub.scheme);
+		// elog(INFO, "cmp_text_range res %d", res);
     // at this poirnt, both of them has same schema
     // start checking hosts
 	if (res == 0)
 		res = cmp_hosts(&ua, &ub);
-    // // at this state, both schema and host are the same
-    // // check the path/(file)
-    // if (res == 0)
-    //     res = cmp_path(&ua, &ub);
-    // // check the whole URL (File and fragments)
+		// elog(INFO, "cmp_hosts res %d", res);
+    // at this state, both schema and host are the same
+    // check the path/(file)
+	// where path is url path, and file is path+query
 	if (res == 0)
 		res = strcasecmp_ascii(sa, sb);
+		//  elog(INFO, "strcasecmp_ascii res %d", res);
 	if (res == 0)
 		res = strcmp(sa, sb);
+		// elog(INFO, "strcmp res %d", res);
 	uriFreeUriMembersA(&ua);
 	uriFreeUriMembersA(&ub);
+		// elog(INFO, "---------------------------------------------------------------");
+
 
 	return res;
 }
@@ -396,7 +425,7 @@ Datum url_in(PG_FUNCTION_ARGS)
 				 errmsg("Too many arguments %d",
 						length)));
 	}
-	elog(INFO, "I am 4 %s", new_text);
+	// elog(INFO, "I am 4 %s", new_text);
 	parse_url(new_text, &uri);
 	uriFreeUriMembersA(&uri);
 	vardata = (url *)cstring_to_text(new_text);
@@ -469,7 +498,7 @@ Datum get_default_port(PG_FUNCTION_ARGS)
 	else if (strcmp(st, "ftp") == 0)
 		PG_RETURN_INT32(21);
 	else
-		PG_RETURN_NULL();
+		PG_RETURN_INT32(8080);
 }
 
 PG_FUNCTION_INFO_V1(get_protocol);
@@ -667,7 +696,7 @@ Datum same_url(PG_FUNCTION_ARGS)
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	int res;
-	res  = url_cmp(arg1, arg2);
+	res  = url_cmp(arg1, arg2, false);
 	if(res == 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -682,7 +711,7 @@ Datum url_abs_rt(PG_FUNCTION_ARGS)
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	int res;
-	res  = url_cmp(arg1, arg2);
+	res  = url_cmp(arg1, arg2, false);
 	
 	if(res > 0)
 		PG_RETURN_BOOL(1);
@@ -697,7 +726,7 @@ Datum url_abs_lt(PG_FUNCTION_ARGS)
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	int res;
-	res  = url_cmp(arg1, arg2);
+	res  = url_cmp(arg1, arg2, false);
 	if(res < 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -711,7 +740,7 @@ Datum url_rt(PG_FUNCTION_ARGS)
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	int res;
-	res  = url_cmp(arg1, arg2);
+	res  = url_cmp(arg1, arg2, false);
 	if(res >= 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -724,7 +753,7 @@ Datum url_lt(PG_FUNCTION_ARGS)
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	int res;
-	res  = url_cmp(arg1, arg2);
+	res  = url_cmp(arg1, arg2, false);
 	if(res <= 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -738,5 +767,13 @@ Datum url_cmp_internal(PG_FUNCTION_ARGS)
 {
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
-	PG_RETURN_INT32(url_cmp(arg1, arg2));
+	PG_RETURN_INT32(url_cmp(arg1, arg2, true));
+}
+
+PG_FUNCTION_INFO_V1(url_cmp_internal_btree);
+Datum url_cmp_internal_btree(PG_FUNCTION_ARGS)
+{
+	Datum arg1 = PG_GETARG_DATUM(0);
+	Datum arg2 = PG_GETARG_DATUM(1);
+	PG_RETURN_INT32(url_cmp(arg1, arg2, true));
 }
