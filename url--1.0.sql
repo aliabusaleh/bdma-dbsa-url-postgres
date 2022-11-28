@@ -117,10 +117,8 @@ CREATE FUNCTION url_rt(url, url) RETURNS boolean AS '$libdir/url',
 CREATE FUNCTION url_lt(url, url) RETURNS boolean AS '$libdir/url',
 'url_lt' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION url_cmp(url, url) RETURNS integer AS '$libdir/url',
-'url_cmp_internal' LANGUAGE C IMMUTABLE STRICT;
-
-
+CREATE FUNCTION url_cmp_btree(url, url) RETURNS integer AS '$libdir/url',
+'url_cmp_internal_btree' LANGUAGE C IMMUTABLE STRICT;
 
 
 CREATE OPERATOR < (
@@ -176,4 +174,4 @@ AS
         OPERATOR        3       =  ,
         OPERATOR        4       >= ,
         OPERATOR        5       >  ,
-        FUNCTION        1       url_cmp(url, url);
+        FUNCTION        1       url_cmp_btree(url, url);
