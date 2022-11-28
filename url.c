@@ -213,89 +213,89 @@ cmp_hosts(UriUriA *uap, UriUriA *ubp)
 		return cmp_text_range(uap->hostText, ubp->hostText);
 }
 
-// static int
-// strcasecmp_ascii(const char *s1, const char *s2)
-// {
-// 	for (;;)
-// 	{
-// 		unsigned char ch1 = (unsigned char) *s1++;
-// 		unsigned char ch2 = (unsigned char) *s2++;
+static int
+strcasecmp_ascii(const char *s1, const char *s2)
+{
+	for (;;)
+	{
+		unsigned char ch1 = (unsigned char) *s1++;
+		unsigned char ch2 = (unsigned char) *s2++;
 
-// 		if (ch1 != ch2)
-// 		{
-// 			if (ch1 >= 'A' && ch1 <= 'Z')
-// 				ch1 += 'a' - 'A';
+		if (ch1 != ch2)
+		{
+			if (ch1 >= 'A' && ch1 <= 'Z')
+				ch1 += 'a' - 'A';
 
-// 			if (ch2 >= 'A' && ch2 <= 'Z')
-// 				ch2 += 'a' - 'A';
+			if (ch2 >= 'A' && ch2 <= 'Z')
+				ch2 += 'a' - 'A';
 
-// 			if (ch1 != ch2)
-// 				return (int) ch1 - (int) ch2;
-// 		}
-// 		if (ch1 == 0)
-// 			break;
-// 	}
-// 	return 0;
-// }
+			if (ch1 != ch2)
+				return (int) ch1 - (int) ch2;
+		}
+		if (ch1 == 0)
+			break;
+	}
+	return 0;
+}
 
-// static int cmp_nodes(struct UriPathSegmentStructA *a, struct UriPathSegmentStructA *b)
-// {
-// 	int res = 0;
-// 	while (a != NULL && b != NULL) {
-// 		res = cmp_text_range(a->text, b->text);
-// 		if res != 0
-// 			return res;
-// 			/* If we reach here, then a and b are not NULL and
-//            their data is same, so move to next nodes in both
-//            lists */
-// 		a = a->next;
-// 		b = b->next;
-// 	}
-// 	// maybe of of them are is shorter than the other
-// 	// case a is longer ( and b reached null )
-// 	if (a != NULL) return -1;
-// 	// case b is longer ( and a reached null )
-//     if (b != NULL) return 1;
-// 	// If linked lists are identical, then 'a' and 'b' must
-// 	// be NULL at this point.
-// 	// return 0
-// 	return 0;
-// }
+static int cmp_nodes(struct UriPathSegmentStructA *a, struct UriPathSegmentStructA *b)
+{
+	int res = 0;
+	while (a != NULL && b != NULL) {
+		res = cmp_text_range(a->text, b->text);
+		if(res != 0)
+			return res;
+			/* If we reach here, then a and b are not NULL and
+           their data is same, so move to next nodes in both
+           lists */
+		a = a->next;
+		b = b->next;
+	}
+	// maybe of of them are is shorter than the other
+	// case a is longer ( and b reached null )
+	if (a != NULL) return -1;
+	// case b is longer ( and a reached null )
+    if (b != NULL) return 1;
+	// If linked lists are identical, then 'a' and 'b' must
+	// be NULL at this point.
+	// return 0
+	return 0;
+}
 
-// static int cmp_path(UriUriA *uap, UriUriA *ubp)
-// {
-// 	// if first host is null
-// 	int result;
-// 	if(!uap->pathHead->text.first){
-// 		// if second host is null
-// 		if(!ubp->pathHead->text.first){
-// 			// both of them are null
-// 			return 0;
-// 		}
-// 		// first is null, but second is not null
-// 		else {
-// 			return -1;
-// 		}
-// 	}
-// 	// first one isn't null, but second one is null
-// 	else if (!ubp->pathHead->text.first){
-// 		return 1;
-// 	}
+static int cmp_path(UriUriA *uap, UriUriA *ubp)
+{
+	// if first host is null
+	int result;
+	if(!uap->pathHead->text.first){
+		// if second host is null
+		if(!ubp->pathHead->text.first){
+			// both of them are null
+			return 0;
+		}
+		// first is null, but second is not null
+		else {
+			return -1;
+		}
+	}
+	// first one isn't null, but second one is null
+	else if (!ubp->pathHead->text.first){
+		return 1;
+	}
 
-// 	// at this stage both are not null, we need to compare
-// 	result = 0;
-// 	result = cmp_text_range(uap->pathHead->text, ubp->pathHead->text);
-// 	if (result == 0){
+	// at this stage both are not null, we need to compare
+	result = 0;
+	result = cmp_text_range(uap->pathHead->text, ubp->pathHead->text);
+	if (result == 0){
 
-// 	struct UriPathSegmentStructA *uap_v2 = uap->pathHead->next;
-// 	struct UriPathSegmentStructA *ubp_v2 = ubp->pathHead->next;
-// 		result = cmp_nodes(uap_v2, ubp_v2);
-// 	}
+	struct UriPathSegmentStructA *uap_v2 = uap->pathHead->next;
+	struct UriPathSegmentStructA *ubp_v2 = ubp->pathHead->next;
+		result = cmp_nodes(uap_v2, ubp_v2);
+	}
 
-// 	// return the results anyway
-// 	return result;
+	// return the results anyway
+	return result;
 
-// }
+}
 
 // Btree compere function
 /*
@@ -304,38 +304,40 @@ cmp_hosts(UriUriA *uap, UriUriA *ubp)
  * text is bigger than Ip, if you compare www.google.com AND  129.231.222.8 --> then  www.google.com > 129.231.222.8
  * do we need to check port/whole string ?
  */
-// static int
-// url_cmp(Datum a, Datum b)
-// {
-// 	const char *sa = TextDatumGetCString(a);
-// 	const char *sb = TextDatumGetCString(b);
-// 	UriUriA ua;
-// 	UriUriA ub;
-// 	int res = 0;
+static int
+url_cmp(Datum a, Datum b)
+{
+	char *sa = TextDatumGetCString(a);
+	char *sb = TextDatumGetCString(b);
+	UriUriA ua;
+	UriUriA ub;
+	int res = 0;
 
-// 	parse_url(sa, &ua);
-// 	parse_url(sb, &ub);
+	parse_url(sa, &ua);
+	parse_url(sb, &ub);
+	elog(INFO, "I url cmp %s", sa);
+	elog(INFO, "I url cmp%s", sb);
 
-// 	if (res == 0)
-// 		res = cmp_text_range(ua.scheme, ub.scheme);
-//     // at this poirnt, both of them has same schema
-//     // start checking hosts
-// 	if (res == 0)
-// 		res = cmp_hosts(&ua, &ub);
-//     // at this state, both schema and host are the same
-//     // check the path/(file)
-//     if (res == 0)
-//         res = cmp_path(&ua, &ub);
-//     // check the whole URL (File and fragments)
-// 	if (res == 0)
-// 		res = strcasecmp_ascii(sa, sb);
-// 	if (res == 0)
-// 		res = strcmp(sa, sb);
-// 	uriFreeUriMembersA(&ua);
-// 	uriFreeUriMembersA(&ub);
+	if (res == 0)
+		res = cmp_text_range(ua.scheme, ub.scheme);
+    // at this poirnt, both of them has same schema
+    // start checking hosts
+	if (res == 0)
+		res = cmp_hosts(&ua, &ub);
+    // // at this state, both schema and host are the same
+    // // check the path/(file)
+    // if (res == 0)
+    //     res = cmp_path(&ua, &ub);
+    // // check the whole URL (File and fragments)
+	if (res == 0)
+		res = strcasecmp_ascii(sa, sb);
+	if (res == 0)
+		res = strcmp(sa, sb);
+	uriFreeUriMembersA(&ua);
+	uriFreeUriMembersA(&ub);
 
-// 	return res;
-// }
+	return res;
+}
 
 PG_FUNCTION_INFO_V1(url_in);
 Datum url_in(PG_FUNCTION_ARGS)
@@ -653,29 +655,88 @@ Datum same_host(PG_FUNCTION_ARGS)
 	parse_url(s1, &ua);
 	parse_url(s2, &ub);
 	res = cmp_hosts(&ua, &ub);
-	// elog(INFO, "I am same %d", res);
 	if (res == 0)
 		PG_RETURN_BOOL(1);
 	else
 		PG_RETURN_BOOL(0);
 }
 
-// PG_FUNCTION_INFO_V1(same_url);
-// Datum same_url(PG_FUNCTION_ARGS)
-// {
-// 	Datum arg1 = PG_GETARG_DATUM(0);
-// 	Datum arg2 = PG_GETARG_DATUM(1);
-// 	char *s1 = TextDatumGetCString(arg1);
-// 	char *s2 = TextDatumGetCString(arg2);
-// 	UriUriA ua;
-// 	UriUriA ub;
-// 	int res = 0;
-// 	parse_url(s1, &ua);
-// 	parse_url(s2, &ub);
-// 	res  = url_cmp(&ua, &ub);
-// 	elog(INFO, "I am same %d", res);
-// 	if(res == 0)
-// 		PG_RETURN_BOOL(1);
-// 	else
-// 		PG_RETURN_BOOL(0);
-// }
+PG_FUNCTION_INFO_V1(same_url);
+Datum same_url(PG_FUNCTION_ARGS)
+{
+	Datum arg1 = PG_GETARG_DATUM(0);
+	Datum arg2 = PG_GETARG_DATUM(1);
+	int res;
+	res  = url_cmp(arg1, arg2);
+	if(res == 0)
+		PG_RETURN_BOOL(1);
+	else
+		PG_RETURN_BOOL(0);
+}
+
+
+
+PG_FUNCTION_INFO_V1(url_abs_rt);
+Datum url_abs_rt(PG_FUNCTION_ARGS)
+{
+	Datum arg1 = PG_GETARG_DATUM(0);
+	Datum arg2 = PG_GETARG_DATUM(1);
+	int res;
+	res  = url_cmp(arg1, arg2);
+	
+	if(res > 0)
+		PG_RETURN_BOOL(1);
+	else
+		PG_RETURN_BOOL(0);
+}
+
+
+PG_FUNCTION_INFO_V1(url_abs_lt);
+Datum url_abs_lt(PG_FUNCTION_ARGS)
+{
+	Datum arg1 = PG_GETARG_DATUM(0);
+	Datum arg2 = PG_GETARG_DATUM(1);
+	int res;
+	res  = url_cmp(arg1, arg2);
+	if(res < 0)
+		PG_RETURN_BOOL(1);
+	else
+		PG_RETURN_BOOL(0);
+}
+
+
+PG_FUNCTION_INFO_V1(url_rt);
+Datum url_rt(PG_FUNCTION_ARGS)
+{
+	Datum arg1 = PG_GETARG_DATUM(0);
+	Datum arg2 = PG_GETARG_DATUM(1);
+	int res;
+	res  = url_cmp(arg1, arg2);
+	if(res >= 0)
+		PG_RETURN_BOOL(1);
+	else
+		PG_RETURN_BOOL(0);
+}
+
+PG_FUNCTION_INFO_V1(url_lt);
+Datum url_lt(PG_FUNCTION_ARGS)
+{
+	Datum arg1 = PG_GETARG_DATUM(0);
+	Datum arg2 = PG_GETARG_DATUM(1);
+	int res;
+	res  = url_cmp(arg1, arg2);
+	if(res <= 0)
+		PG_RETURN_BOOL(1);
+	else
+		PG_RETURN_BOOL(0);
+}
+
+
+
+PG_FUNCTION_INFO_V1(url_cmp_internal);
+Datum url_cmp_internal(PG_FUNCTION_ARGS)
+{
+	Datum arg1 = PG_GETARG_DATUM(0);
+	Datum arg2 = PG_GETARG_DATUM(1);
+	PG_RETURN_INT32(url_cmp(arg1, arg2));
+}
