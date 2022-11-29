@@ -43,19 +43,14 @@ CREATE TYPE url (
 COMMENT ON TYPE url IS 'url type  http://www.example.com<:port>/docs/resource1.html<#tag> where <> is optional';
 
 -- casting methods 
--- CREATE OR REPLACE FUNCTION url(text)
--- RETURNS url
--- AS '$libdir/url', 'url_cast_from_text'
--- LANGUAGE C IMMUTABLE STRICT;
--- CREATE OR REPLACE FUNCTION text(url)
--- RETURNS text
--- AS '$libdir/url', 'url_cast_to_text'
--- LANGUAGE C IMMUTABLE STRICT;
--- Btree
--- CREATE FUNCTION url_cmp(ntext, ntext)
--- RETURNS integer
--- AS '$libdir/url'
--- LANGUAGE C IMMUTABLE STRICT;
+CREATE OR REPLACE FUNCTION url_cast(text)
+RETURNS url
+AS '$libdir/url', 'url_cast_from_text'
+LANGUAGE C IMMUTABLE STRICT;
+
+CREATE CAST (url AS text) WITH INOUT AS ASSIGNMENT;
+CREATE CAST (text AS url) WITH FUNCTION url_cast(text) AS ASSIGNMENT;
+
 -- Get host function
 CREATE FUNCTION getHost(url) RETURNS text AS '$libdir/url',
 'get_host' LANGUAGE C IMMUTABLE STRICT;
