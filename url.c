@@ -487,10 +487,13 @@ Datum get_default_port(PG_FUNCTION_ARGS)
 	UriUriA url;
 	char *st;
 	parse_url(s, &url);
-	st = TextDatumGetCString(uri_text_range_to_text(url.scheme));
-	uriFreeUriMembersA(&url);
 	// Check if host is present or not
 	// If not return null
+	if (!url.scheme.first ){
+		PG_RETURN_INT32(-1);
+	}
+	st = TextDatumGetCString(uri_text_range_to_text(url.scheme));
+	uriFreeUriMembersA(&url);
 	if (strcmp(st, "http") == 0)
 		PG_RETURN_INT32(80);
 	else if (strcmp(st, "https") == 0)
