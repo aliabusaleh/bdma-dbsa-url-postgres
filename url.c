@@ -27,8 +27,7 @@ Datum url_in(PG_FUNCTION_ARGS);
 Datum url_out(PG_FUNCTION_ARGS);
 // Datum url_recv(PG_FUNCTION_ARGS);
 // Datum url_send(PG_FUNCTION_ARGS);
-// Datum url_cast_to_text(PG_FUNCTION_ARGS);
-// Datum url_cast_from_text(PG_FUNCTION_ARGS);
+Datum url_cast_from_text(PG_FUNCTION_ARGS);
 
 static char *toArray(int number)
 {
@@ -487,8 +486,8 @@ Datum get_default_port(PG_FUNCTION_ARGS)
 	UriUriA url;
 	char *st;
 	parse_url(s, &url);
-	// Check if host is present or not
-	// If not return null
+	// Check if port is present or not
+	// If not return -1
 	if (!url.scheme.first ){
 		PG_RETURN_INT32(-1);
 	}
@@ -780,3 +779,14 @@ Datum url_cmp_internal_btree(PG_FUNCTION_ARGS)
 	Datum arg2 = PG_GETARG_DATUM(1);
 	PG_RETURN_INT32(url_cmp(arg1, arg2, true));
 }
+
+PG_FUNCTION_INFO_V1(url_cast_from_text);
+Datum url_cast_from_text(PG_FUNCTION_ARGS){
+	url *vardata;
+	text* arg1 = PG_GETARG_TEXT_P(0);
+	char* str = DatumGetCString(DirectFunctionCall1(textout, PointerGetDatum(arg1)));
+	vardata = (url *)cstring_to_text(str);
+
+	PG_RETURN_URL_P(vardata);
+}
+
