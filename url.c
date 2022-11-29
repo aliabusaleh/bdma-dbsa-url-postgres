@@ -551,6 +551,10 @@ Datum get_user_info(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(get_ref);
 Datum get_ref(PG_FUNCTION_ARGS)
 {
+	if (PG_ARGISNULL(0) == NULL){
+		elog(WARNING, "No Ref found");
+		PG_RETURN_NULL();
+	}
 	Datum arg = PG_GETARG_DATUM(0);
 	char *s = TextDatumGetCString(arg);
 	UriUriA url;
@@ -566,6 +570,10 @@ Datum get_ref(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(get_path);
 Datum get_path(PG_FUNCTION_ARGS)
 {
+	if (PG_ARGISNULL(0) == NULL){
+		elog(WARNING, "No Path found");
+		PG_RETURN_NULL();
+	}
 	Datum arg = PG_GETARG_DATUM(0);
 	char *s = TextDatumGetCString(arg);
 	UriUriA url;
@@ -593,6 +601,10 @@ Datum get_path(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(get_file);
 Datum get_file(PG_FUNCTION_ARGS)
 {
+	if (PG_ARGISNULL(0) == NULL){
+		elog(WARNING, "No File found");
+		PG_RETURN_NULL();
+	}
 	Datum arg = PG_GETARG_DATUM(0);
 	char *s = TextDatumGetCString(arg);
 	UriUriA url;
@@ -624,6 +636,10 @@ Datum get_file(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(get_authority);
 Datum get_authority(PG_FUNCTION_ARGS)
 {
+	if (PG_ARGISNULL(0) == NULL){
+		elog(WARNING, "No Authority found");
+		PG_RETURN_NULL();
+	}
 	Datum arg = PG_GETARG_DATUM(0);
 	char *s = TextDatumGetCString(arg);
 	UriUriA url;
@@ -695,6 +711,8 @@ Datum same_host(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(same_url);
 Datum same_url(PG_FUNCTION_ARGS)
 {
+	short len = PG_NARGS();
+	elog(INFO, " in origin args is %d", len);
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	int res;
