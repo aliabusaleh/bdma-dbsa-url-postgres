@@ -60,9 +60,21 @@ static void
 parse_url(const char *s, UriUriA *urip)
 {
 	UriParserStateA state;
-
+	char * default_url;
+	short l = strlen(s);
+	char default_scheme[7]= "http://"; 
+	if(strstr(s, "://"))
+	{
+		default_url = malloc((l) * sizeof(char));
+		strcpy(default_url,s);
+	}
+	else {
+		default_url = malloc((l+5) * sizeof(char));
+		strcpy(default_url,default_scheme);
+		strncat(default_url, s, l);
+	}
 	state.uri = urip;
-	uriParseUriA(&state, s);
+	uriParseUriA(&state, default_url);
 
 	switch (state.errorCode)
 	{
@@ -163,8 +175,6 @@ cmp_hosts(UriUriA *uap, UriUriA *ubp)
 	{
 		// if second host is null
 		if (!ubp->hostText.first) {
-			// both of them are null
-			// elog(INFO, "both of them are null ");
 
 			return 0;
 		}
@@ -342,17 +352,14 @@ url_cmp(Datum a, Datum b, bool btree)
 		sb = uriStringb;
 
 	}
-	// elog(INFO, "I url cmp %s", sa);
-	// elog(INFO, "I url cmp %s", sb);
+
 
 	if (res == 0)
 		res = cmp_text_range(ua.scheme, ub.scheme);
-		// elog(INFO, "cmp_text_range res %d", res);
     // at this poirnt, both of them has same schema
     // start checking hosts
 	if (res == 0)
 		res = cmp_hosts(&ua, &ub);
-		// elog(INFO, "cmp_hosts res %d", res);
     // at this state, both schema and host are the same
     // check the path/(file)
 	// where path is url path, and file is path+query
@@ -361,7 +368,6 @@ url_cmp(Datum a, Datum b, bool btree)
 		//  elog(INFO, "strcasecmp_ascii res %d", res);
 	if (res == 0)
 		res = strcmp(sa, sb);
-		// elog(INFO, "strcmp res %d", res);
 	uriFreeUriMembersA(&ua);
 	uriFreeUriMembersA(&ub);
 		// elog(INFO, "---------------------------------------------------------------");
@@ -374,14 +380,12 @@ PG_FUNCTION_INFO_V1(url_in);
 Datum url_in(PG_FUNCTION_ARGS)
 {
 	short len = PG_NARGS();
-	//elog(INFO, "inide URL_in, len is :%d", len);
 	char *new_text = PG_GETARG_CSTRING(0);
 	url *vardata;
 	UriUriA uri;
 	int length = PG_NARGS();
 	// // special case where call function without url_in
 	// if (PG_ARGISNULL(1) == NULL | PG_ARGISNULL(1) ){
-	// 	elog(INFO, "INSIDE ARG 1 == NULL");
 	// 	length = 1;
 	// }
 	if (length == 1)
@@ -434,7 +438,6 @@ Datum url_in(PG_FUNCTION_ARGS)
 				 errmsg("Too many arguments %d",
 						length)));
 	}
-	// elog(INFO, "I am 4 %s", new_text);
 	parse_url(new_text, &uri);
 	uriFreeUriMembersA(&uri);
 	vardata = (url *)cstring_to_text(new_text);
@@ -706,8 +709,6 @@ Datum same_host(PG_FUNCTION_ARGS)
 	Datum arg2 = PG_GETARG_DATUM(1);
 	char *s1 = TextDatumGetCString(arg1);
 	char *s2 = TextDatumGetCString(arg2);
-	//elog(INFO, "first arg %s", s1);
-	//elog(INFO, "second arg %s", s2);
 
 	UriUriA ua;
 	UriUriA ub;
@@ -715,7 +716,6 @@ Datum same_host(PG_FUNCTION_ARGS)
 	parse_url(s1, &ua);
 	parse_url(s2, &ub);
 	res = cmp_hosts(&ua, &ub);
-	//elog(INFO, "res is : %d", res);
 	if (res == 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -735,7 +735,6 @@ Datum same_url(PG_FUNCTION_ARGS)
 	char *sa = TextDatumGetCString(arg1);
 	char *sb = TextDatumGetCString(arg2);
 	res = strcasecmp_ascii(sa, sb);
-		//  elog(INFO, "strcasecmp_ascii res %d", res);
 	if (res == 0)
 		res = strcmp(sa, sb);
 	if(res == 0)
