@@ -370,10 +370,17 @@ url_cmp(Datum a, Datum b, bool btree)
 PG_FUNCTION_INFO_V1(url_in);
 Datum url_in(PG_FUNCTION_ARGS)
 {
+	short len = PG_NARGS();
+	elog(INFO, "inide URL_in, len is :%d", len);
 	char *new_text = PG_GETARG_CSTRING(0);
 	url *vardata;
 	UriUriA uri;
 	int length = PG_NARGS();
+	// special case where call function without url_in
+	if (PG_ARGISNULL(1) == NULL){
+		elog(INFO, "INSIDE ARG 1 == NULL");
+		length = 1;
+	}
 	if (length == 1)
 	{
 		char *arg1 = PG_GETARG_CSTRING(0);
@@ -551,7 +558,7 @@ Datum get_user_info(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(get_ref);
 Datum get_ref(PG_FUNCTION_ARGS)
 {
-	if (PG_ARGISNULL(0) == NULL){
+	if (PG_ARGISNULL(0)){
 		elog(WARNING, "No Ref found");
 		PG_RETURN_NULL();
 	}
@@ -570,7 +577,7 @@ Datum get_ref(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(get_path);
 Datum get_path(PG_FUNCTION_ARGS)
 {
-	if (PG_ARGISNULL(0) == NULL){
+	if (PG_ARGISNULL(0)){
 		elog(WARNING, "No Path found");
 		PG_RETURN_NULL();
 	}
@@ -601,7 +608,7 @@ Datum get_path(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(get_file);
 Datum get_file(PG_FUNCTION_ARGS)
 {
-	if (PG_ARGISNULL(0) == NULL){
+	if (PG_ARGISNULL(0)){
 		elog(WARNING, "No File found");
 		PG_RETURN_NULL();
 	}
@@ -636,7 +643,7 @@ Datum get_file(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(get_authority);
 Datum get_authority(PG_FUNCTION_ARGS)
 {
-	if (PG_ARGISNULL(0) == NULL){
+	if (PG_ARGISNULL(0)){
 		elog(WARNING, "No Authority found");
 		PG_RETURN_NULL();
 	}
@@ -711,8 +718,10 @@ Datum same_host(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(same_url);
 Datum same_url(PG_FUNCTION_ARGS)
 {
-	short len = PG_NARGS();
-	elog(INFO, " in origin args is %d", len);
+	if (PG_ARGISNULL(0) | PG_ARGISNULL(2)){
+		elog(WARNING, "Two argument are required SameURL(text,text)");
+		PG_RETURN_NULL();
+	}
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	int res;
