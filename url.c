@@ -377,73 +377,85 @@ url_cmp(Datum a, Datum b, bool btree)
 }
 
 PG_FUNCTION_INFO_V1(url_in);
-Datum url_in(PG_FUNCTION_ARGS)
+Datum
+url_in(PG_FUNCTION_ARGS)
 {
-	short len = PG_NARGS();
-	char *new_text = PG_GETARG_CSTRING(0);
-	url *vardata;
+	char* s = PG_GETARG_CSTRING(0);
+	url* vardata;
 	UriUriA uri;
-	int length = PG_NARGS();
-	// // special case where call function without url_in
-	// if (PG_ARGISNULL(1) == NULL | PG_ARGISNULL(1) ){
-	// 	length = 1;
-	// }
-	if (length == 1)
-	{
-		char *arg1 = PG_GETARG_CSTRING(0);
-		new_text = malloc(strlen(arg1));
-		strcpy(new_text, arg1);
-	}
-	else if (length == 2)
-	{
-		Datum arg1 = PG_GETARG_DATUM(0);
-		char *arg2 = PG_GETARG_CSTRING(1);
-		char *s = TextDatumGetCString(arg1);
-		new_text = malloc(strlen(s) + strlen(arg2) + +1 + 10);
-		strcpy(new_text, s);
-		strcat(new_text, arg2);
-	}
-	else if (length == 3)
-	{
-		char *arg1 = PG_GETARG_CSTRING(0);
-		char *arg2 = PG_GETARG_CSTRING(1);
-		char *arg3 = PG_GETARG_CSTRING(2);
-		new_text = malloc(strlen(arg1) + strlen(arg2) + strlen(arg3) + 1 + 10);
-		strcpy(new_text, arg1);
-		strcat(new_text, "://");
-		strcat(new_text, arg2);
-		strcat(new_text, "/");
-		strcat(new_text, arg3);
-	}
-	else if (length == 4)
-	{
-		char *arg1 = PG_GETARG_CSTRING(0);
-		char *arg2 = PG_GETARG_CSTRING(1);
-		int32 arg3 = PG_GETARG_INT32(2);
-		char *arg4 = PG_GETARG_CSTRING(3);
-		char *port = toArray(arg3);
-		new_text = malloc(strlen(arg1) + strlen(arg2) + strlen(port) + strlen(arg4) + 1 + 10);
-		strcpy(new_text, arg1);
-		strcat(new_text, "://");
-		strcat(new_text, arg2);
-		strcat(new_text, ":");
-		strcat(new_text, port);
-		strcat(new_text, "/");
-		strcat(new_text, arg4);
-	}
-	else
-	{
-		ereport(ERROR,
-				(errcode(ERRCODE_TOO_MANY_ARGUMENTS),
-				 errmsg("Too many arguments %d",
-						length)));
-	}
-	parse_url(new_text, &uri);
+	parse_url(s, &uri);
 	uriFreeUriMembersA(&uri);
-	vardata = (url *)cstring_to_text(new_text);
+	vardata = (url*)cstring_to_text(s);
 	PG_RETURN_URL_P(vardata);
 }
 
+
+PG_FUNCTION_INFO_V1(url_in_part_two);
+Datum
+url_in_part_two(PG_FUNCTION_ARGS)
+{
+	url* vardata;
+	UriUriA uri;
+	char* arg1 = PG_GETARG_CSTRING(0);
+	char* arg2 = PG_GETARG_CSTRING(1);
+	int32 arg3 = PG_GETARG_INT32(2);
+	char* arg4 = PG_GETARG_CSTRING(3);
+	char* port = toArray(arg3);
+	char* new_text;
+	new_text = malloc(strlen(arg1) + strlen(arg2) + strlen(port) + strlen(arg4) + 1 + 10);
+	strcpy(new_text, arg1);
+	strcat(new_text, "://");
+	strcat(new_text, arg2);
+	strcat(new_text, ":");
+	strcat(new_text, port);
+	strcat(new_text, "/");
+	strcat(new_text, arg4);
+	parse_url(new_text, &uri);
+	uriFreeUriMembersA(&uri);
+	vardata = (url*)cstring_to_text(new_text);
+	PG_RETURN_URL_P(vardata);
+}
+
+PG_FUNCTION_INFO_V1(url_in_part_three);
+Datum
+url_in_part_three(PG_FUNCTION_ARGS)
+{
+	url* vardata;
+	UriUriA uri;
+	char* arg1 = PG_GETARG_CSTRING(0);
+	char* arg2 = PG_GETARG_CSTRING(1);
+	char* arg3 = PG_GETARG_CSTRING(2);
+	char* new_text;
+	new_text = malloc(strlen(arg1) + strlen(arg2) + strlen(arg3) + 1 + 10);
+	strcpy(new_text, arg1);
+	strcat(new_text, "://");
+	strcat(new_text, arg2);
+	strcat(new_text, "/");
+	strcat(new_text, arg3);
+	parse_url(new_text, &uri);
+	uriFreeUriMembersA(&uri);
+	vardata = (url*)cstring_to_text(new_text);
+	PG_RETURN_URL_P(vardata);
+}
+
+PG_FUNCTION_INFO_V1(url_in_part_four);
+Datum
+url_in_part_four(PG_FUNCTION_ARGS)
+{
+	url* vardata;
+	UriUriA uri;
+	Datum arg1 = PG_GETARG_DATUM(0);
+	char* arg2 = PG_GETARG_CSTRING(1);
+	char* s = TextDatumGetCString(arg1);
+	char* new_text;
+	new_text = malloc(strlen(s) + strlen(arg2) + +1 + 10);
+	strcpy(new_text, s);
+	strcat(new_text, arg2);
+	parse_url(new_text, &uri);
+	uriFreeUriMembersA(&uri);
+	vardata = (url*)cstring_to_text(new_text);
+	PG_RETURN_URL_P(vardata);
+}
 PG_FUNCTION_INFO_V1(url_out);
 Datum url_out(PG_FUNCTION_ARGS)
 {
