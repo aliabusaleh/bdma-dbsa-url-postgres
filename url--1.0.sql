@@ -3,6 +3,9 @@
 CREATE
 OR REPLACE FUNCTION url_in(cstring) RETURNS url AS '$libdir/url' LANGUAGE C IMMUTABLE STRICT;
 
+CREATE
+OR REPLACE FUNCTION url_in(text) RETURNS url AS '$libdir/url' LANGUAGE C IMMUTABLE STRICT;
+
 -- URL(varchar protocol, varchar host, int port, varchar file)
 -- Usage insert into test values(url_in('https','www.yahoo.com',32,'abc.png'));
 CREATE
