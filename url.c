@@ -448,7 +448,7 @@ url_in_part_four(PG_FUNCTION_ARGS)
 	char* arg2 = PG_GETARG_CSTRING(1);
 	char* s = TextDatumGetCString(arg1);
 	char* new_text;
-	new_text = malloc(strlen(s) + strlen(arg2) + +1 + 10);
+	new_text = malloc(strlen(s) + strlen(arg2) +1 + 10);
 	strcpy(new_text, s);
 	strcat(new_text, arg2);
 	parse_url(new_text, &uri);
@@ -832,10 +832,13 @@ Datum url_cmp_internal_btree(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(url_cast_from_text);
 Datum url_cast_from_text(PG_FUNCTION_ARGS){
+	Datum arg1 = PG_GETARG_DATUM(0);
+	char *s1 = TextDatumGetCString(arg1);
+	UriUriA ua;
+	parse_url(s1, &ua);
+	uriFreeUriMembersA(&ua);
 	url *vardata;
-	text* arg1 = PG_GETARG_TEXT_P(0);
-	char* str = DatumGetCString(DirectFunctionCall1(textout, PointerGetDatum(arg1)));
-	vardata = (url *)cstring_to_text(str);
+	vardata = (url*)cstring_to_text(s1);
 
 	PG_RETURN_URL_P(vardata);
 }
