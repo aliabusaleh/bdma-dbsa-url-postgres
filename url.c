@@ -162,9 +162,12 @@ cmp_hosts(UriUriA *uap, UriUriA *ubp)
 	if (!uap->hostText.first)
 	{
 		// if second host is null
-		if (!ubp->hostText.first)
+		if (!ubp->hostText.first) {
 			// both of them are null
+			// elog(INFO, "both of them are null ");
+
 			return 0;
+		}
 		else
 			// first one is null, but second is not null
 			return -1;
@@ -371,16 +374,16 @@ PG_FUNCTION_INFO_V1(url_in);
 Datum url_in(PG_FUNCTION_ARGS)
 {
 	short len = PG_NARGS();
-	elog(INFO, "inide URL_in, len is :%d", len);
+	//elog(INFO, "inide URL_in, len is :%d", len);
 	char *new_text = PG_GETARG_CSTRING(0);
 	url *vardata;
 	UriUriA uri;
 	int length = PG_NARGS();
-	// special case where call function without url_in
-	if (PG_ARGISNULL(1) == NULL){
-		elog(INFO, "INSIDE ARG 1 == NULL");
-		length = 1;
-	}
+	// // special case where call function without url_in
+	// if (PG_ARGISNULL(1) == NULL | PG_ARGISNULL(1) ){
+	// 	elog(INFO, "INSIDE ARG 1 == NULL");
+	// 	length = 1;
+	// }
 	if (length == 1)
 	{
 		char *arg1 = PG_GETARG_CSTRING(0);
@@ -703,12 +706,16 @@ Datum same_host(PG_FUNCTION_ARGS)
 	Datum arg2 = PG_GETARG_DATUM(1);
 	char *s1 = TextDatumGetCString(arg1);
 	char *s2 = TextDatumGetCString(arg2);
+	//elog(INFO, "first arg %s", s1);
+	//elog(INFO, "second arg %s", s2);
+
 	UriUriA ua;
 	UriUriA ub;
 	int res = 0;
 	parse_url(s1, &ua);
 	parse_url(s2, &ub);
 	res = cmp_hosts(&ua, &ub);
+	//elog(INFO, "res is : %d", res);
 	if (res == 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -725,7 +732,12 @@ Datum same_url(PG_FUNCTION_ARGS)
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	int res;
-	res  = url_cmp(arg1, arg2, false);
+	char *sa = TextDatumGetCString(arg1);
+	char *sb = TextDatumGetCString(arg2);
+	res = strcasecmp_ascii(sa, sb);
+		//  elog(INFO, "strcasecmp_ascii res %d", res);
+	if (res == 0)
+		res = strcmp(sa, sb);
 	if(res == 0)
 		PG_RETURN_BOOL(1);
 	else
