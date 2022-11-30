@@ -822,13 +822,24 @@ Datum url_cmp_internal(PG_FUNCTION_ARGS)
 	PG_RETURN_INT32(url_cmp(arg1, arg2, true));
 }
 
-PG_FUNCTION_INFO_V1(url_cmp_internal_btree);
-Datum url_cmp_internal_btree(PG_FUNCTION_ARGS)
+PG_FUNCTION_INFO_V1(url_cmp_internal_same_host);
+Datum url_cmp_internal_same_host(PG_FUNCTION_ARGS)
 {
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
-	PG_RETURN_INT32(url_cmp(arg1, arg2, true));
+	char *s1 = TextDatumGetCString(arg1);
+	char *s2 = TextDatumGetCString(arg2);
+
+	UriUriA ua;
+	UriUriA ub;
+	int res = 0;
+	parse_url(s1, &ua);
+	parse_url(s2, &ub);
+	res = cmp_hosts(&ua, &ub);
+	PG_RETURN_INT32(res);
 }
+
+
 
 PG_FUNCTION_INFO_V1(url_cast_from_text);
 Datum url_cast_from_text(PG_FUNCTION_ARGS){
