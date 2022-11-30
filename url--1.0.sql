@@ -130,6 +130,19 @@ CREATE FUNCTION sameUrl(url, text) RETURNS boolean AS '$libdir/url',
 CREATE FUNCTION sameUrl(text, url) RETURNS boolean AS '$libdir/url',
 'same_url' LANGUAGE C IMMUTABLE STRICT;
 
+
+-- equals
+CREATE FUNCTION equals(url, url) RETURNS boolean AS '$libdir/url',
+'same_url' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION equals(text, text) RETURNS boolean AS '$libdir/url',
+'same_url' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION equals(url, text) RETURNS boolean AS '$libdir/url',
+'same_url' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION equals(text, url) RETURNS boolean AS '$libdir/url',
+'same_url' LANGUAGE C IMMUTABLE STRICT;
+
 -- Functions for operators
 CREATE FUNCTION url_abs_rt(url, url) RETURNS boolean AS '$libdir/url',
 'url_abs_rt' LANGUAGE C IMMUTABLE STRICT;
