@@ -717,10 +717,13 @@ Datum get_string(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(same_host);
 Datum same_host(PG_FUNCTION_ARGS)
 {
+	// elog(INFO, "im here!");
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
 	char *s1 = TextDatumGetCString(arg1);
 	char *s2 = TextDatumGetCString(arg2);
+	// elog(INFO, "s1: %s, s2: %s", s1, s2);
+
 
 	UriUriA ua;
 	UriUriA ub;
@@ -728,6 +731,7 @@ Datum same_host(PG_FUNCTION_ARGS)
 	parse_url(s1, &ua);
 	parse_url(s2, &ub);
 	res = cmp_hosts(&ua, &ub);
+	// elog(INFO, "res is %d", res);
 	if (res == 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -832,11 +836,15 @@ Datum url_cmp_internal_btree(PG_FUNCTION_ARGS)
 
 PG_FUNCTION_INFO_V1(url_cast_from_text);
 Datum url_cast_from_text(PG_FUNCTION_ARGS){
-	url *vardata;
-	text* arg1 = PG_GETARG_TEXT_P(0);
-	char* str = DatumGetCString(DirectFunctionCall1(textout, PointerGetDatum(arg1)));
-	vardata = (url *)cstring_to_text(str);
-
+	// elog(INFO, "inside cast!");
+	char* s = PG_GETARG_CSTRING(0);
+	// elog(INFO, "input is %s", s);
+	url* vardata;
+	UriUriA uri;
+	parse_url(s, &uri);
+	uriFreeUriMembersA(&uri);
+	// elog(INFO, "output is %s", s);
+	vardata = (url*)cstring_to_text(s);
 	PG_RETURN_URL_P(vardata);
 }
 
