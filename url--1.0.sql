@@ -111,16 +111,13 @@ CREATE FUNCTION sameHost(url, url) RETURNS boolean AS
 
 
 
+-- -- Same URL
+-- CREATE FUNCTION sameUrl(url, url) RETURNS boolean AS '$libdir/url',
+-- ' select $1 = $2 AND  sameUrlInternal($1, $2) ' LANGUAGE SQL IMMUTABLE STRICT;
+
+
 -- Same URL
-CREATE FUNCTION sameUrl(url, url) RETURNS boolean AS '$libdir/url',
-'same_url' LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION sameUrl(text, text) RETURNS boolean AS '$libdir/url',
-'same_url' LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION sameUrl(url, text) RETURNS boolean AS '$libdir/url',
-'same_url' LANGUAGE C IMMUTABLE STRICT;
-CREATE FUNCTION sameUrl(text, url) RETURNS boolean AS '$libdir/url',
+CREATE FUNCTION sameUrlInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_url' LANGUAGE C IMMUTABLE STRICT;
 
 
