@@ -121,6 +121,20 @@ CREATE FUNCTION sameUrlInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_url' LANGUAGE C IMMUTABLE STRICT;
 
 
+
+-- Same File
+CREATE FUNCTION sameFile(url, url) RETURNS boolean AS '$libdir/url',
+'same_file' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION sameFile(text, text) RETURNS boolean AS '$libdir/url',
+'same_file' LANGUAGE C IMMUTABLE STRICT;
+
+CREATE FUNCTION sameFile(url, text) RETURNS boolean AS '$libdir/url',
+'same_file' LANGUAGE C IMMUTABLE STRICT;
+CREATE FUNCTION sameFile(text, url) RETURNS boolean AS '$libdir/url',
+'same_file' LANGUAGE C IMMUTABLE STRICT;
+
+
 -- equals
 CREATE FUNCTION equals(url, url) RETURNS boolean AS '$libdir/url',
 'same_url' LANGUAGE C IMMUTABLE STRICT;
@@ -147,8 +161,10 @@ CREATE FUNCTION url_lt(url, url) RETURNS boolean AS '$libdir/url',
 'url_lt' LANGUAGE C IMMUTABLE STRICT;
 
 CREATE FUNCTION url_cmp_btree(url, url) RETURNS integer AS '$libdir/url',
-'url_cmp_internal_btree' LANGUAGE C IMMUTABLE STRICT;
+'url_cmp_internal' LANGUAGE C IMMUTABLE STRICT;
 
+CREATE FUNCTION url_cmp_btree_same_host(url, url) RETURNS integer AS '$libdir/url',
+'url_cmp_internal_same_host' LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR < (
         leftarg = url,
@@ -204,3 +220,13 @@ AS
         OPERATOR        4       >= ,
         OPERATOR        5       >  ,
         FUNCTION        1       url_cmp_btree(url, url);
+
+CREATE OPERATOR CLASS sameHost
+FOR TYPE url USING btree
+AS
+        OPERATOR        1       <  ,
+        OPERATOR        2       <= ,
+        OPERATOR        3       =  ,
+        OPERATOR        4       >= ,
+        OPERATOR        5       >  ,
+        FUNCTION        1       url_cmp_btree_same_host(url, url);
