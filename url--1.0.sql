@@ -138,14 +138,18 @@ CREATE FUNCTION sameUrl(text, url) RETURNS boolean AS '$libdir/url',
 CREATE FUNCTION sameFile(url, url) RETURNS boolean AS '$libdir/url',
 'same_file' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION sameFile(text, text) RETURNS boolean AS '$libdir/url',
-'same_file' LANGUAGE C IMMUTABLE STRICT;
+-- CREATE FUNCTION sameFile(text, text) RETURNS boolean AS '$libdir/url',
+-- 'same_file' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION sameFile(url, text) RETURNS boolean AS '$libdir/url',
-'same_file' LANGUAGE C IMMUTABLE STRICT;
-CREATE FUNCTION sameFile(text, url) RETURNS boolean AS '$libdir/url',
-'same_file' LANGUAGE C IMMUTABLE STRICT;
+-- CREATE FUNCTION sameFile(url, text) RETURNS boolean AS '$libdir/url',
+-- 'same_file' LANGUAGE C IMMUTABLE STRICT;
+-- CREATE FUNCTION sameFile(text, url) RETURNS boolean AS '$libdir/url',
+-- 'same_file' LANGUAGE C IMMUTABLE STRICT;
 
+
+-- Same File Beta version
+CREATE FUNCTION sameFileBeta(url, url) RETURNS boolean AS '$libdir/url',
+'same_file_beta' LANGUAGE C IMMUTABLE STRICT;
 
 -- equals
 CREATE FUNCTION equals(url, url) RETURNS boolean AS '$libdir/url',
