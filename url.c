@@ -107,7 +107,7 @@ static int compare_path(UriUriA *uap, UriUriA *ubp)
 	}
 	if(pa==NULL && pb!=NULL)
 		return -1;
-	if(pa==NULL && pb!=NULL)
+	if(pa!=NULL && pb==NULL)
 		return 1;
 	return compare_url_text_range(uap->query,ubp->query);
 }
