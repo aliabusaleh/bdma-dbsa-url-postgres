@@ -122,11 +122,12 @@ CREATE FUNCTION equalsInternal(url, url) RETURNS boolean AS '$libdir/url',
 -- CREATE FUNCTION NotequalsInternal(url, url) RETURNS boolean 
 -- 'select ($1 = $2 = false) AND (sameFileInternal($1, $2) = false)  AND (equalsInternal($1, $2) = false) ' LANGUAGE SQL IMMUTABLE STRICT;
 
+
 ---------- Btree ----
 
--- -- equals
--- CREATE FUNCTION equals(url, url) RETURNS boolean AS  
--- 'select $1 = $2 AND (sameFileInternal($1, $2)) AND (equalsInternal($1, $2))' LANGUAGE SQL IMMUTABLE STRICT;
+-- equals
+CREATE FUNCTION equals(url, url) RETURNS boolean AS  
+'select sameFile($1, $2) AND equalsInternal($1, $2)' LANGUAGE SQL IMMUTABLE STRICT;
 
 -- Btree cmp 
 CREATE FUNCTION Btreecmp(url, url) RETURNS integer AS '$libdir/url',

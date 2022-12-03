@@ -778,12 +778,9 @@ Datum same_url(PG_FUNCTION_ARGS)
 	}
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
-	int res;
-	char *sa = TextDatumGetCString(arg1);
-	char *sb = TextDatumGetCString(arg2);
-	res = strcasecmp_ascii(sa, sb);
-	if (res == 0)
-		res = strcmp(sa, sb);
+	char *s1 = TextDatumGetCString(arg1);
+	char *s2 = TextDatumGetCString(arg2);
+	int res = url_cmp(arg1, arg2, false);
 	if(res == 0)
 		PG_RETURN_BOOL(1);
 	else
