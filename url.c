@@ -231,7 +231,6 @@ cmp_hosts(UriUriA *uap, UriUriA *ubp)
 	{
 		// if second host is null
 		if (!ubp->hostText.first) {
-
 			return 0;
 		}
 		else
@@ -373,9 +372,8 @@ static int cmp_path(UriUriA *uap, UriUriA *ubp)
  * do we need to check port/whole string ?
  */
 static int
-url_cmp(Datum a, Datum b, bool btree)
+url_cmp(Datum a, Datum b, bool ignore_fragment)
 {
-	// elog(INFO, "Entering url_cmp!");
 	char *sa = TextDatumGetCString(a);
 	char *sb = TextDatumGetCString(b);
 	UriUriA ua;
@@ -386,10 +384,7 @@ url_cmp(Datum a, Datum b, bool btree)
 	parse_url(sb, &ub);
 
 	// just remove fragments and query for Btree
-	if (btree == true){
-		// elog(INFO,"enter btree");
-		// elog(INFO, "I url cmp start %s", sa);
-		// elog(INFO, "I url cmp start %s", sb);
+	if (ignore_fragment == true){
 		// ignore fragment
 		ua.fragment.first = NULL;
 		ua.fragment.afterLast = NULL;
@@ -421,14 +416,10 @@ url_cmp(Datum a, Datum b, bool btree)
 	// where path is url path, and file is path+query
 	if (res == 0)
 		res = strcasecmp_ascii(sa, sb);
-		//  elog(INFO, "strcasecmp_ascii res %d", res);
 	if (res == 0)
 		res = strcmp(sa, sb);
 	uriFreeUriMembersA(&ua);
 	uriFreeUriMembersA(&ub);
-		// elog(INFO, "---------------------------------------------------------------");
-
-
 	return res;
 }
 
@@ -444,6 +435,26 @@ url_in(PG_FUNCTION_ARGS)
 	vardata = (url*)cstring_to_text(s);
 	PG_RETURN_URL_P(vardata);
 }
+
+PG_FUNCTION_INFO_V1(btree_cmp);
+Datum
+btree_cmp(PG_FUNCTION_ARGS)
+{
+	Datum a = PG_GETARG_DATUM(0);
+	Datum b = PG_GETARG_DATUM(1);
+	char *sa = TextDatumGetCString(a);
+	char *sb = TextDatumGetCString(b);
+	UriUriA ua;
+	UriUriA ub;
+	int res = 0;
+
+	parse_url(sa, &ua);
+	parse_url(sb, &ub);
+	res = cmp_hosts(&ua, &ub);
+	PG_RETURN_INT32(res);
+}
+
+
 
 
 PG_FUNCTION_INFO_V1(url_in_part_two);
@@ -504,7 +515,7 @@ url_in_part_four(PG_FUNCTION_ARGS)
 	char* arg2 = PG_GETARG_CSTRING(1);
 	char* s = TextDatumGetCString(arg1);
 	char* new_text;
-	new_text = malloc(strlen(s) + strlen(arg2) + +1 + 10);
+	new_text = malloc(strlen(s) + strlen(arg2) +1 + 10);
 	strcpy(new_text, s);
 	strcat(new_text, arg2);
 	parse_url(new_text, &uri);
@@ -778,6 +789,7 @@ Datum same_host(PG_FUNCTION_ARGS)
 	char *s1 = TextDatumGetCString(arg1);
 	char *s2 = TextDatumGetCString(arg2);
 
+
 	UriUriA ua;
 	UriUriA ub;
 	int res = 0;
@@ -795,12 +807,9 @@ Datum same_url(PG_FUNCTION_ARGS)
 {
 	Datum arg1 = PG_GETARG_DATUM(0);
 	Datum arg2 = PG_GETARG_DATUM(1);
-	int res;
-	char *sa = TextDatumGetCString(arg1);
-	char *sb = TextDatumGetCString(arg2);
-	res = strcasecmp_ascii(sa, sb);
-	if (res == 0)
-		res = strcmp(sa, sb);
+	char *s1 = TextDatumGetCString(arg1);
+	char *s2 = TextDatumGetCString(arg2);
+	int res = url_cmp(arg1, arg2, false);
 	if(res == 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -818,16 +827,7 @@ Datum same_file(PG_FUNCTION_ARGS)
 	Datum arg2 = PG_GETARG_DATUM(1);
 	char *s1 = TextDatumGetCString(arg1);
 	char *s2 = TextDatumGetCString(arg2);
-	int res;
-	UriUriA url1;
-	UriUriA url2;
-	parse_url(s1, &url1);
-	parse_url(s2, &url2);
-	char *sa = create_file(url1);
-	char *sb = create_file(url2);
-	res = strcasecmp_ascii(sa, sb);
-	if (res == 0)
-		res = strcmp(sa, sb);
+	int res = url_cmp(arg1, arg2, true);
 	if(res == 0)
 		PG_RETURN_BOOL(1);
 	else
@@ -900,21 +900,16 @@ Datum url_cmp_internal(PG_FUNCTION_ARGS)
 	PG_RETURN_INT32(url_cmp(arg1, arg2, true));
 }
 
-PG_FUNCTION_INFO_V1(url_cmp_internal_btree);
-Datum url_cmp_internal_btree(PG_FUNCTION_ARGS)
-{
-	Datum arg1 = PG_GETARG_DATUM(0);
-	Datum arg2 = PG_GETARG_DATUM(1);
-	PG_RETURN_INT32(url_cmp(arg1, arg2, true));
-}
+
 
 PG_FUNCTION_INFO_V1(url_cast_from_text);
 Datum url_cast_from_text(PG_FUNCTION_ARGS){
-	url *vardata;
-	text* arg1 = PG_GETARG_TEXT_P(0);
-	char* str = DatumGetCString(DirectFunctionCall1(textout, PointerGetDatum(arg1)));
-	vardata = (url *)cstring_to_text(str);
-
+	char* s = PG_GETARG_CSTRING(0);
+	url* vardata;
+	UriUriA uri;
+	parse_url(s, &uri);
+	uriFreeUriMembersA(&uri);
+	vardata = (url*)cstring_to_text(s);
 	PG_RETURN_URL_P(vardata);
 }
 
