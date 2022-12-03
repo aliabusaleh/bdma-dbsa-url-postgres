@@ -116,7 +116,7 @@ CREATE FUNCTION sameUrlInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_url' LANGUAGE C IMMUTABLE STRICT;
 
 -- Same File
-CREATE FUNCTION sameFile(url, url) RETURNS boolean AS '$libdir/url',
+CREATE FUNCTION sameFileInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_file_beta' LANGUAGE C IMMUTABLE STRICT;
 
 
