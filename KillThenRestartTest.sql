@@ -6,10 +6,11 @@ psql;
 create extension url;
 create table test(arg url);
 
-insert into test select url_in(arg, '/test') from test;
 insert into test(arg) values (url_in('https', 'www.yahoo.com', 32, 'abc.png'));
-insert into test values (url_in('https://www.google.com?q=a&c=4'));
-insert into test values (url_in('https://abc:xyz@www.yes.com/abc/xyz?s=3#njcdncnd'));
+insert into test select url_in(arg, '/test') from test;
+
+insert into test values ('https://www.google.com?q=a&c=4');
+insert into test values ('https://abc:xyz@www.yes.com/abc/xyz?s=3#njcdncnd');
 insert into test values('www.abc.com');
 insert into test values('www.abc.com/33');
 insert into test values('www.google.com');
@@ -20,7 +21,7 @@ insert into test values('www.google.com/path1/path2/file.html#2');
 insert into test values('www.google.com/path1/path2/path3/file.html#2');
 
 
-create index on test(arg);
+create index arg_idx on test(arg);
 select * from test ;
 set enable_seqscan=False; -- disable sequantal scan
 
