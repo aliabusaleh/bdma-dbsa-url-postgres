@@ -41,6 +41,34 @@ static char *toArray(int number)
 	return numberArray;
 }
 
+static bool
+_is_host_set(UriUriA *url)
+{
+	return (url != NULL) && ((url->hostText.first != NULL) || (url->hostData.ip6 != NULL) || (url->hostData.ip4 != NULL) || (url->hostData.ipFuture.first != NULL));
+}
+
+static char *create_file(UriUriA url)
+{
+	StringInfoData buf;
+	UriPathSegmentA *p;
+	initStringInfo(&buf);
+	if (url.absolutePath || (_is_host_set(&url) && url.pathHead))
+		appendStringInfoChar(&buf, '/');
+
+	for (p = url.pathHead; p; p = p->next)
+	{
+		appendBinaryStringInfo(&buf, p->text.first, p->text.afterLast - p->text.first);
+		if (p->next)
+			appendStringInfoChar(&buf, '/');
+	}
+	if (url.query.first)
+	{
+		appendStringInfoChar(&buf, '?');
+		appendBinaryStringInfo(&buf, url.query.first, url.query.afterLast - url.query.first);
+	}
+	return buf.data;
+}
+
 static text *
 uri_text_range_to_text(UriTextRangeA text_url)
 {
@@ -50,11 +78,6 @@ uri_text_range_to_text(UriTextRangeA text_url)
 	return cstring_to_text_with_len(text_url.first, text_url.afterLast - text_url.first);
 }
 
-static bool
-_is_host_set(UriUriA *url)
-{
-	return (url != NULL) && ((url->hostText.first != NULL) || (url->hostData.ip6 != NULL) || (url->hostData.ip4 != NULL) || (url->hostData.ipFuture.first != NULL));
-}
 
 static void
 parse_url(const char *s, UriUriA *urip)
@@ -755,6 +778,32 @@ Datum same_url(PG_FUNCTION_ARGS)
 		PG_RETURN_BOOL(0);
 }
 
+PG_FUNCTION_INFO_V1(same_file);
+Datum same_file(PG_FUNCTION_ARGS)
+{
+	if (PG_ARGISNULL(0) | PG_ARGISNULL(2)){
+		elog(WARNING, "Two argument are required SameURL(text,text)");
+		PG_RETURN_NULL();
+	}
+	Datum arg1 = PG_GETARG_DATUM(0);
+	Datum arg2 = PG_GETARG_DATUM(1);
+	char *s1 = TextDatumGetCString(arg1);
+	char *s2 = TextDatumGetCString(arg2);
+	int res;
+	UriUriA url1;
+	UriUriA url2;
+	parse_url(s1, &url1);
+	parse_url(s2, &url2);
+	char *sa = create_file(url1);
+	char *sb = create_file(url2);
+	res = strcasecmp_ascii(sa, sb);
+	if (res == 0)
+		res = strcmp(sa, sb);
+	if(res == 0)
+		PG_RETURN_BOOL(1);
+	else
+		PG_RETURN_BOOL(0);
+}
 
 
 PG_FUNCTION_INFO_V1(url_abs_rt);
