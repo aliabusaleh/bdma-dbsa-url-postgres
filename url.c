@@ -810,7 +810,7 @@ Datum same_url(PG_FUNCTION_ARGS)
 PG_FUNCTION_INFO_V1(same_file);
 Datum same_file(PG_FUNCTION_ARGS)
 {
-	if (PG_ARGISNULL(0) | PG_ARGISNULL(2)){
+	if (PG_ARGISNULL(0) | PG_ARGISNULL(1)){
 		elog(WARNING, "Two argument are required SameFile(text,text)");
 		PG_RETURN_NULL();
 	}
