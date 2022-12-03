@@ -105,47 +105,40 @@ CREATE FUNCTION to_string(url) RETURNS text AS '$libdir/url',
 CREATE FUNCTION sameHostInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_host' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION sameHost(url, url) RETURNS boolean AS 
-'select $1 = $2 ' LANGUAGE SQL IMMUTABLE STRICT;
-
-
-
-
--- -- Same URL
--- CREATE FUNCTION sameUrl(url, url) RETURNS boolean AS '$libdir/url',
--- ' select $1 = $2 AND  sameUrlInternal($1, $2) ' LANGUAGE SQL IMMUTABLE STRICT;
-
 
 -- Same URL
 CREATE FUNCTION sameUrlInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_url' LANGUAGE C IMMUTABLE STRICT;
 
-
-
 -- Same File
-CREATE FUNCTION sameFile(url, url) RETURNS boolean AS '$libdir/url',
+CREATE FUNCTION sameFileInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_file' LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION sameFile(text, text) RETURNS boolean AS '$libdir/url',
-'same_file' LANGUAGE C IMMUTABLE STRICT;
-
-CREATE FUNCTION sameFile(url, text) RETURNS boolean AS '$libdir/url',
-'same_file' LANGUAGE C IMMUTABLE STRICT;
-CREATE FUNCTION sameFile(text, url) RETURNS boolean AS '$libdir/url',
-'same_file' LANGUAGE C IMMUTABLE STRICT;
-
 
 -- equals
-CREATE FUNCTION equals(url, url) RETURNS boolean AS '$libdir/url',
+CREATE FUNCTION equalsInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_url' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION equals(text, text) RETURNS boolean AS '$libdir/url',
-'same_url' LANGUAGE C IMMUTABLE STRICT;
+-- -- Not equals
+-- CREATE FUNCTION NotequalsInternal(url, url) RETURNS boolean 
+-- 'select ($1 = $2 = false) AND (sameFileInternal($1, $2) = false)  AND (equalsInternal($1, $2) = false) ' LANGUAGE SQL IMMUTABLE STRICT;
 
-CREATE FUNCTION equals(url, text) RETURNS boolean AS '$libdir/url',
-'same_url' LANGUAGE C IMMUTABLE STRICT;
-CREATE FUNCTION equals(text, url) RETURNS boolean AS '$libdir/url',
-'same_url' LANGUAGE C IMMUTABLE STRICT;
+---------- Btree ----
+
+-- -- equals
+-- CREATE FUNCTION equals(url, url) RETURNS boolean AS  
+-- 'select $1 = $2 AND (sameFileInternal($1, $2)) AND (equalsInternal($1, $2))' LANGUAGE SQL IMMUTABLE STRICT;
+
+-- Btree cmp 
+CREATE FUNCTION Btreecmp(url, url) RETURNS integer AS '$libdir/url',
+'btree_cmp' LANGUAGE C IMMUTABLE STRICT;
+
+-- Same File
+CREATE FUNCTION sameFile(url, url) RETURNS boolean AS 
+'select $1 = $2 AND  sameFileInternal($1, $2) ' LANGUAGE SQL IMMUTABLE STRICT;
+
+CREATE FUNCTION sameHost(url, url) RETURNS boolean AS 
+'select $1 = $2 ' LANGUAGE SQL IMMUTABLE STRICT;
+
 
 -- Functions for operators
 CREATE FUNCTION url_abs_rt(url, url) RETURNS boolean AS '$libdir/url',
@@ -163,8 +156,6 @@ CREATE FUNCTION url_lt(url, url) RETURNS boolean AS '$libdir/url',
 CREATE FUNCTION url_cmp_btree(url, url) RETURNS integer AS '$libdir/url',
 'url_cmp_internal' LANGUAGE C IMMUTABLE STRICT;
 
-CREATE FUNCTION url_cmp_btree_same_host(url, url) RETURNS integer AS '$libdir/url',
-'url_cmp_internal_same_host' LANGUAGE C IMMUTABLE STRICT;
 
 CREATE OPERATOR < (
         leftarg = url,
@@ -211,6 +202,16 @@ CREATE OPERATOR = (
         HASHES, MERGES
 );
 
+-- CREATE OPERATOR <> (
+--         leftarg = url,
+--         rightarg = url,
+--         procedure = NotequalsInternal,
+--         COMMUTATOR = '<>',
+-- 	NEGATOR = '=',
+-- 	RESTRICT = neqsel,
+--         HASHES, MERGES
+-- );
+
 CREATE OPERATOR CLASS btree_url_ops
 DEFAULT FOR TYPE url USING btree
 AS
@@ -219,14 +220,4 @@ AS
         OPERATOR        3       =  ,
         OPERATOR        4       >= ,
         OPERATOR        5       >  ,
-        FUNCTION        1       url_cmp_btree(url, url);
-
-CREATE OPERATOR CLASS sameHost
-FOR TYPE url USING btree
-AS
-        OPERATOR        1       <  ,
-        OPERATOR        2       <= ,
-        OPERATOR        3       =  ,
-        OPERATOR        4       >= ,
-        OPERATOR        5       >  ,
-        FUNCTION        1       url_cmp_btree_same_host(url, url);
+        FUNCTION        1       Btreecmp(url, url);
