@@ -5,6 +5,11 @@ RETURNS url
 AS '$libdir/url','url_in'
 LANGUAGE C IMMUTABLE STRICT;
 
+CREATE OR REPLACE FUNCTION url_in(text)
+RETURNS url
+AS '$libdir/url','url_in'
+LANGUAGE C IMMUTABLE STRICT;
+
 
 CREATE OR REPLACE FUNCTION url_in(cstring, cstring, integer, cstring)
 RETURNS url
@@ -54,7 +59,7 @@ AS '$libdir/url', 'url_cast_from_text'
 LANGUAGE C IMMUTABLE STRICT;
 
 CREATE CAST (url AS text) WITH INOUT AS ASSIGNMENT;
-CREATE CAST (text AS url) WITH FUNCTION url_cast(text) AS ASSIGNMENT ;
+CREATE CAST (text AS url) WITH FUNCTION url_in(text) AS ASSIGNMENT ;
 
 -- Get host function
 CREATE FUNCTION getHost(url) RETURNS text AS '$libdir/url',
@@ -118,9 +123,9 @@ CREATE FUNCTION sameFileInternal(url, url) RETURNS boolean AS '$libdir/url',
 CREATE FUNCTION equalsInternal(url, url) RETURNS boolean AS '$libdir/url',
 'same_url' LANGUAGE C IMMUTABLE STRICT;
 
--- -- Not equals
--- CREATE FUNCTION NotequalsInternal(url, url) RETURNS boolean 
--- 'select ($1 = $2 = false) AND (sameFileInternal($1, $2) = false)  AND (equalsInternal($1, $2) = false) ' LANGUAGE SQL IMMUTABLE STRICT;
+-- Not equals
+CREATE FUNCTION NotequalsInternal(url, url) RETURNS boolean AS
+'select NOT(sameFile($1, $2)) OR NOT(equalsInternal($1, $2))' LANGUAGE SQL IMMUTABLE STRICT;
 
 
 ---------- Btree ----
@@ -203,15 +208,15 @@ CREATE OPERATOR = (
         HASHES, MERGES
 );
 
--- CREATE OPERATOR <> (
---         leftarg = url,
---         rightarg = url,
---         procedure = NotequalsInternal,
---         COMMUTATOR = '<>',
--- 	NEGATOR = '=',
--- 	RESTRICT = neqsel,
---         HASHES, MERGES
--- );
+CREATE OPERATOR <> (
+        leftarg = url,
+        rightarg = url,
+        procedure = NotequalsInternal,
+        COMMUTATOR = '<>',
+	NEGATOR = '=',
+	RESTRICT = neqsel,
+	JOIN = neqjoinsel
+);
 
 CREATE OPERATOR CLASS btree_url_ops
 DEFAULT FOR TYPE url USING btree
