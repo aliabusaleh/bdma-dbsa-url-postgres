@@ -1,4 +1,4 @@
-# DBMA: DBSA Project 2
+# DBMA: DBSA Project 2 (Postgres Extension: URL)
 This project is done under the BDMA first semester at Université Libre de Bruxelles
 
 
