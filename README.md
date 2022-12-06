@@ -22,3 +22,7 @@ This project is done by: </br>
 
 Under supervision of professor <b>Mahmoud Sakr</b>
 
+## Prerequiests 
+* [liburiparser library]: https://pypi.org/project/uniparser/
+* Python 
+
