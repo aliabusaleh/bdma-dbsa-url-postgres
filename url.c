@@ -47,28 +47,6 @@ _is_host_set(UriUriA *url)
 	return (url != NULL) && ((url->hostText.first != NULL) || (url->hostData.ip6 != NULL) || (url->hostData.ip4 != NULL) || (url->hostData.ipFuture.first != NULL));
 }
 
-static char *create_file(UriUriA url)
-{
-	StringInfoData buf;
-	UriPathSegmentA *p;
-	initStringInfo(&buf);
-	if (url.absolutePath || (_is_host_set(&url) && url.pathHead))
-		appendStringInfoChar(&buf, '/');
-
-	for (p = url.pathHead; p; p = p->next)
-	{
-		appendBinaryStringInfo(&buf, p->text.first, p->text.afterLast - p->text.first);
-		if (p->next)
-			appendStringInfoChar(&buf, '/');
-	}
-	if (url.query.first)
-	{
-		appendStringInfoChar(&buf, '?');
-		appendBinaryStringInfo(&buf, url.query.first, url.query.afterLast - url.query.first);
-	}
-	return buf.data;
-}
-
 static text *
 uri_text_range_to_text(UriTextRangeA text_url)
 {
