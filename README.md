@@ -9,8 +9,7 @@ reference to a more complicated object, such as a query to a database or to a se
 standardized by W3C.
 
 The goal of this project is to create an equivalent type to java.net.URL class in Postgres. More information about the java
-class can be found here:
-https://docs.oracle.com/javase/8/docs/api/java/net/URL.html
+class can be found [here](https://docs.oracle.com/javase/8/docs/api/java/net/URL.html)
 
 
 This project is done by: </br>
@@ -196,6 +195,59 @@ postgres=# select * from test where equals(arg, 'www.abc.com/33'); -- check all 
 postgres=# 
 
 ```
+
+# Run Extention using Docker
+
+## Installation
+
+To easily install and use the extension without worrying about platform. Please follow below steps
+
+1. Install docker in your system. Please follow the below link to install docker in windows and mac respectively
+
+[Docker Windows](https://docs.docker.com/desktop/install/windows-install/)
+
+[Docker Mac](https://docs.docker.com/desktop/install/mac-install/)
+
+[Docker Linux](https://docs.docker.com/desktop/install/linux-install/)
+
+
+2. Move to the directory of source code of extension
+
+3. Run Below command to start docker container
+
+```bash
+  docker-compose up -d
+```
+
+4. After start of docker container. Enter the docker container.
+```bash
+  docker exec -it postgre_ext bash
+```
+
+5. In docker container, start the postgres process.
+```bash
+  pg_ctlcluster 14 main start
+```
+
+6. Build the extension with `make` command
+```bash
+  make
+  make install
+```
+
+7. Setup extension in postgres
+```bash
+  sudo -i -u postgres
+  psql postgres
+```
+
+8. Inside postgres install the extension
+```bash
+  create extension url;
+```
+
+Now extension is installed and ready to be used.
+
 
 ## <b>Question?</b>
 <b>Feel free to contact us for more questions regarding this extension</b>
