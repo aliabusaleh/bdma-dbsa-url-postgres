@@ -26,7 +26,7 @@ Under supervision of professor <b>Mahmoud Sakr</b>
 * [PostgreSQL](https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart)
 * Python 
 ## <b>How to run the code </b>
-### Build the extention
+### Build the extension
 ```
 $ pip install uniparser 
 $ git clone https://github.com/aliabusaleh/bdma-dbsa-url-postgres.git
@@ -34,7 +34,7 @@ $ cd bdma-dbsa-url-postgres
 $ sudo make  
 $ sudo make install
 ```
-### <b>how to use the extention in PostgreSQL</b>
+### <b>how to use the extension in PostgreSQL</b>
 <b>*Login to Postgres using your creds*</b>
 ```
 postgres=# create extension url;
@@ -43,7 +43,7 @@ CREATE EXTENSION
 ## <b>Testing </b>
 
 <b>using testing.sql</b>
-### How to test the Extention 
+### How to test the extension 
 ```
 postgres=# create table test(arg url);
 CREATE TABLE
@@ -196,7 +196,7 @@ postgres=#
 
 ```
 
-# Run Extention using Docker
+# Run extension using Docker
 
 ## Installation
 
