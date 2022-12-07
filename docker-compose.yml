@@ -7,5 +7,6 @@
      volumes:
        - .:/url_extension
     #  command: "pg_ctlcluster 14 main start"
+     working_dir: /url_extension
      entrypoint: /bin/bash
      container_name: postgre_ext
