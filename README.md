@@ -25,7 +25,34 @@ Under supervision of professor <b>Mahmoud Sakr</b>
 * [liburiparser library](https://pypi.org/project/uniparser/)
 * [PostgreSQL](https://www.digitalocean.com/community/tutorials/how-to-install-postgresql-on-ubuntu-20-04-quickstart)
 * Python 
-## <b>How to run the code </b>
+# Notes & Descriptions
+* <b>Constractor</b> methods are
+  * ```'www.google.com'::url```
+  * ```url_in(URL context, varchar spec)```
+  * ```url_in(varchar protocol, varchar host, varchar file)```
+  * ```url_in(varchar protocol, varchar host, int port, varchar file)```
+* <b>Casting</b>
+  * ```Cast ( text as url)``` 
+  * ``` 'text'::url```
+* <b>Operators </b>
+  * operator (<b>=</b>) : <b>compare Hosts Only</b>.
+* <b>Other methods</b>
+
+  * ```sameHost(url, url)```:  <pre> Compare only hosts of the URLs</pre>
+  * ```sameFile(url, url)```:   <pre> Compare whole URLs <b>without fragment</b></pre>
+  * ```equals(url, url)```:     <pre> Compare whole URLs <b>including fragment</b></pre>
+  * ```getPort(url)```: <pre> Get the port fir a Given URL.</pre> 
+  * ```getDefaultPort(url)```: <pre> Get Default Port for a given URL.</pre>
+  * ```getHost(url)```: <pre> Get the Host for a given URL.</pre>
+  * ```getProtocol(url)```: <pre> Get the protocol for a given URL.</pre>
+  * ```getQuery(url)``` <pre> Get the query for a given URL.</pre>
+  * ```getUserInfo(url)``` <pre> Get UserInfo for a given URL.</pre>
+  * ```getRef(url)``` <pre> Get the reference for a given URL.</pre>
+  * ```getPath(url)``` <pre> Get the path for a given URL.</pre>
+  * ```getFile(url)``` <pre> Get the file for a given URL. </pre>
+  * ```getAuthority(url)``` <pre> Get the authority for a given URL.</pre>
+  * ```to_string(url)``` <pre> cast URL to string.</pre>
+# <b>How to run the code </b>
 ### Build the extension
 ```
 $ pip install uniparser 
